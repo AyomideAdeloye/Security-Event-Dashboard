@@ -1,0 +1,634 @@
+/* ── Reset & fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Design tokens ── */
+:root {
+    --bg:           #0d0f12;
+    --bg-surface:   #13161b;
+    --bg-card:      #181c22;
+    --border:       rgba(255,255,255,0.07);
+    --border-hover: rgba(255,255,255,0.13);
+    --text:         #e8eaf0;
+    --text-muted:   #6b7280;
+    --text-dim:     #3a404d;
+    --red:          #f05252;
+    --red-bg:       rgba(240,82,82,0.08);
+    --red-border:   rgba(240,82,82,0.2);
+    --amber:        #f59e0b;
+    --amber-bg:     rgba(245,158,11,0.08);
+    --amber-border: rgba(245,158,11,0.2);
+    --blue:         #60a5fa;
+    --blue-bg:      rgba(96,165,250,0.08);
+    --blue-border:  rgba(96,165,250,0.2);
+    --green:        #34d399;
+    --green-bg:     rgba(52,211,153,0.08);
+    --green-border: rgba(52,211,153,0.2);
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+}
+
+/* ── Base ── */
+body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+}
+
+/* ── Header ── */
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 2rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-surface);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.logo-mark {
+    width: 28px;
+    height: 28px;
+    background: var(--red);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-mark svg { display: block; }
+
+h1 {
+    font-family: var(--mono);
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+}
+
+.status-pill {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--green);
+    background: var(--green-bg);
+    border: 1px solid var(--green-border);
+    padding: 0.2rem 0.6rem;
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+}
+
+/* ── Main layout ── */
+main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* ── Shared typography ── */
+.section-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+/* ============================================================
+   index.html — metric cards
+   ============================================================ */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+}
+
+.metric-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem;
+    transition: border-color 0.15s;
+    position: relative;
+    overflow: hidden;
+}
+
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    border-radius: 10px 10px 0 0;
+}
+
+.metric-card.total::before  { background: var(--blue); }
+.metric-card.high::before   { background: var(--red); }
+.metric-card.logins::before { background: var(--amber); }
+.metric-card.scans::before  { background: var(--green); }
+
+.metric-card:hover { border-color: var(--border-hover); }
+
+.metric-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+}
+
+.metric-value {
+    font-family: var(--mono);
+    font-size: 2rem;
+    font-weight: 500;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.metric-card.total  .metric-value { color: var(--blue); }
+.metric-card.high   .metric-value { color: var(--red); }
+.metric-card.logins .metric-value { color: var(--amber); }
+.metric-card.scans  .metric-value { color: var(--green); }
+
+.metric-sub {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* ============================================================
+   index.html — upload panel
+   ============================================================ */
+.upload-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.upload-inner {
+    border: 1.5px dashed var(--border-hover);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.upload-inner:hover {
+    border-color: var(--blue-border);
+    background: var(--blue-bg);
+}
+
+.upload-icon {
+    color: var(--text-dim);
+    margin-bottom: 0.75rem;
+}
+
+.upload-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+}
+
+.upload-hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 1.25rem;
+}
+
+.upload-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.file-input-wrapper { position: relative; }
+
+input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+}
+
+.file-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-hover);
+    color: var(--text);
+    background: var(--bg-surface);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.file-label:hover { border-color: var(--blue); color: var(--blue); }
+
+#file-name {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+button[type="submit"] {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.5rem 1.25rem;
+    border-radius: 6px;
+    border: none;
+    background: var(--blue);
+    color: #0d1117;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+
+button[type="submit"]:hover    { opacity: 0.85; }
+button[type="submit"]:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Nav row ── */
+.nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.view-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.view-link:hover { color: var(--text); }
+.view-link svg { transition: transform 0.15s; }
+.view-link:hover svg { transform: translateX(3px); }
+
+form.clear-form { display: inline; }
+
+.clear-btn {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: none;
+    border: 1px solid var(--border-hover);
+    color: var(--text-muted);
+    padding: 0.4rem 0.85rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+}
+
+.clear-btn:hover { color: var(--red); border-color: var(--red-border); }
+
+/* ============================================================
+   events.html — top bar
+   ============================================================ */
+.top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.top-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.back-link:hover { color: var(--text); }
+.back-link svg { transition: transform 0.15s; }
+.back-link:hover svg { transform: translateX(-3px); }
+
+.event-count {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text-dim);
+}
+
+/* ── Upload notice ── */
+.upload-notice {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--green);
+    background: var(--green-bg);
+    border: 1px solid var(--green-border);
+    border-radius: 6px;
+    padding: 0.5rem 0.9rem;
+    margin-bottom: 1.25rem;
+}
+
+/* ============================================================
+   events.html — table
+   ============================================================ */
+.table-wrap {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    table-layout: fixed;
+}
+
+colgroup col.col-id   { width: 5%; }
+colgroup col.col-ip   { width: 14%; }
+colgroup col.col-type { width: 14%; }
+colgroup col.col-sev  { width: 10%; }
+colgroup col.col-cat  { width: 13%; }
+colgroup col.col-desc { width: auto; }
+
+thead th {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-surface);
+    white-space: nowrap;
+}
+
+tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+}
+
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover      { background: rgba(255,255,255,0.025); }
+
+tbody td {
+    padding: 0.7rem 1rem;
+    vertical-align: middle;
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+td.col-id {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text-dim);
+}
+
+td.col-ip {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text);
+}
+
+td.col-desc {
+    color: var(--text-muted);
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.45;
+}
+
+/* ── Event type badge ── */
+.type-badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-hover);
+    color: var(--text-muted);
+    background: var(--bg-surface);
+    white-space: nowrap;
+}
+
+/* ── Severity badge ── */
+.sev {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+.sev-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.sev-high   { color: var(--red);   background: var(--red-bg);   border: 1px solid var(--red-border); }
+.sev-medium { color: var(--amber); background: var(--amber-bg); border: 1px solid var(--amber-border); }
+.sev-low    { color: var(--green); background: var(--green-bg); border: 1px solid var(--green-border); }
+
+.sev-high   .sev-dot { background: var(--red); }
+.sev-medium .sev-dot { background: var(--amber); }
+.sev-low    .sev-dot { background: var(--green); }
+
+/* ── Empty state ── */
+.empty-state {
+    padding: 3.5rem 1rem;
+    text-align: center;
+}
+
+.empty-icon {
+    color: var(--text-dim);
+    margin-bottom: 0.75rem;
+}
+
+.empty-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+}
+
+.empty-sub {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+}
+
+/* ============================================================
+   events.html — pagination
+   ============================================================ */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.page-info {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+.page-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.page-btn {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-hover);
+    background: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: color 0.15s, border-color 0.15s;
+}
+
+.page-btn:hover { color: var(--text); border-color: var(--blue); }
+
+.page-btn.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.page-btn.current {
+    background: var(--blue-bg);
+    border-color: var(--blue-border);
+    color: var(--blue);
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 700px) {
+    header { padding: 1rem 1.25rem; }
+    main   { padding: 1.25rem; }
+
+    /* index */
+    .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+
+    /* events */
+    colgroup col.col-desc,
+    thead th:last-child,
+    tbody td:last-child { display: none; }
+}
+
+/* ============================================================
+   alerts.html — banner & badge variants
+   ============================================================ */
+.alert-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    border-radius: 6px;
+    padding: 0.55rem 0.9rem;
+    margin-bottom: 1.25rem;
+}
+
+.alert-banner-warn {
+    color: var(--red);
+    background: var(--red-bg);
+    border: 1px solid var(--red-border);
+}
+
+.alert-banner-ok {
+    color: var(--green);
+    background: var(--green-bg);
+    border: 1px solid var(--green-border);
+}
+
+/* Red-tinted badge variant for the alerts table */
+.type-badge-alert {
+    color: var(--red);
+    border-color: var(--red-border);
+    background: var(--red-bg);
+}
+
+/* ── Nav links group (index) ── */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.view-link-alert { color: var(--red); }
+.view-link-alert:hover { color: var(--text); }

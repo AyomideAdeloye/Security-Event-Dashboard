@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Event Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header>
+    <div class="header-left">
+        <div class="logo-mark" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M8 2L14 5.5V10.5L8 14L2 10.5V5.5L8 2Z" stroke="#0d0f12" stroke-width="1.5" fill="none"/>
+                <circle cx="8" cy="8" r="2" fill="#0d0f12"/>
+            </svg>
+        </div>
+        <h1>Security Dashboard</h1>
+    </div>
+    <div class="status-pill">
+        <span class="status-dot"></span>
+        Live
+    </div>
+</header>
+
+<main>
+
+    <p class="section-label">Event summary</p>
+
+    <div class="metrics-grid">
+        <div class="metric-card total">
+            <div class="metric-label">Total events</div>
+            <div class="metric-value">{{ total_events }}</div>
+            <div class="metric-sub">All time</div>
+        </div>
+        <div class="metric-card high">
+            <div class="metric-label">High severity</div>
+            <div class="metric-value">{{ high_events }}</div>
+            <div class="metric-sub">Requires attention</div>
+        </div>
+        <div class="metric-card logins">
+            <div class="metric-label">Failed logins</div>
+            <div class="metric-value">{{ failed_logins }}</div>
+            <div class="metric-sub">Auth failures</div>
+        </div>
+        <div class="metric-card scans">
+            <div class="metric-label">Port scans</div>
+            <div class="metric-value">{{ port_scans }}</div>
+            <div class="metric-sub">Recon activity</div>
+        </div>
+    </div>
+
+    <p class="section-label">Ingest logs</p>
+
+    <div class="upload-panel">
+        <form action="/upload" method="POST" enctype="multipart/form-data" id="upload-form">
+            <div class="upload-inner">
+                <div class="upload-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 3v12M7 8l5-5 5 5"/>
+                    </svg>
+                </div>
+                <div class="upload-title">Drop a log file or browse</div>
+                <div class="upload-hint">.log or .txt &mdash; max 5 MB</div>
+                <div class="upload-controls">
+                    <div class="file-input-wrapper">
+                        <label class="file-label" for="log_file">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                            Choose file
+                        </label>
+                        <input type="file" id="log_file" name="log_file" accept=".log,.txt" required>
+                    </div>
+                    <span id="file-name">No file chosen</span>
+                    <button type="submit" id="submit-btn" disabled>Upload</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="nav-row">
+        <div class="nav-links">
+            <a href="/events" class="view-link">
+                View all events
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="/alerts" class="view-link view-link-alert">
+                View alerts
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </a>
+        </div>
+        <form action="/events/clear" method="POST" class="clear-form"
+              onsubmit="return confirm('Delete all events? This cannot be undone.')">
+            <button class="clear-btn" type="submit">Clear all events</button>
+        </form>
+    </div>
+
+</main>
+
+<script>
+    const fileInput = document.getElementById('log_file');
+    const fileName  = document.getElementById('file-name');
+    const submitBtn = document.getElementById('submit-btn');
+
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length) {
+            fileName.textContent = fileInput.files[0].name;
+            submitBtn.disabled = false;
+        } else {
+            fileName.textContent = 'No file chosen';
+            submitBtn.disabled = true;
+        }
+    });
+
+    const uploadInner = document.querySelector('.upload-inner');
+    uploadInner.addEventListener('dragover', e => { e.preventDefault(); uploadInner.style.borderColor = 'var(--blue)'; });
+    uploadInner.addEventListener('dragleave', () => { uploadInner.style.borderColor = ''; });
+    uploadInner.addEventListener('drop', e => {
+        e.preventDefault();
+        uploadInner.style.borderColor = '';
+        const file = e.dataTransfer.files[0];
+        if (file) {
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            fileInput.files = dt.files;
+            fileInput.dispatchEvent(new Event('change'));
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Alerts</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header>
+    <div class="header-left">
+        <div class="logo-mark" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M8 2L14 5.5V10.5L8 14L2 10.5V5.5L8 2Z" stroke="#0d0f12" stroke-width="1.5" fill="none"/>
+                <circle cx="8" cy="8" r="2" fill="#0d0f12"/>
+            </svg>
+        </div>
+        <h1>Security Dashboard</h1>
+    </div>
+    <div class="status-pill">
+        <span class="status-dot"></span>
+        Live
+    </div>
+</header>
+
+<main>
+
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <a href="/" class="back-link">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 19"/></svg>
+                Dashboard
+            </a>
+            <span class="section-label">/ Alerts</span>
+        </div>
+        <span class="event-count">{{ total }} high-severity alert{{ 's' if total != 1 else '' }}</span>
+    </div>
+
+    {% if total == 0 %}
+    <div class="alert-banner alert-banner-ok" role="status">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+        No high-severity events detected. System looks clean.
+    </div>
+    {% else %}
+    <div class="alert-banner alert-banner-warn" role="status">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        {{ total }} high-severity event{{ 's' if total != 1 else '' }} require{{ '' if total != 1 else 's' }} attention.
+    </div>
+    {% endif %}
+
+    <div class="table-wrap">
+        <table>
+            <colgroup>
+                <col class="col-id">
+                <col class="col-ip">
+                <col class="col-type">
+                <col class="col-cat">
+                <col class="col-desc">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">IP address</th>
+                    <th scope="col">Event type</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if alert_rows %}
+                    {% for row in alert_rows %}
+                    <tr>
+                        <td class="col-id">{{ row['id'] }}</td>
+                        <td class="col-ip">{{ row['ip_address'] }}</td>
+                        <td><span class="type-badge type-badge-alert">{{ row['event_type'] }}</span></td>
+                        <td>{{ row['category'] }}</td>
+                        <td class="col-desc">{{ row['description'] }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <div class="empty-icon">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                </div>
+                                <div class="empty-title">No alerts</div>
+                                <div class="empty-sub">No high-severity events have been recorded.</div>
+                            </div>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if total_pages > 1 %}
+    <div class="pagination">
+        <span class="page-info">Page {{ page }} of {{ total_pages }}</span>
+        <div class="page-controls">
+            <a href="?page={{ page - 1 }}"
+               class="page-btn {% if page <= 1 %}disabled{% endif %}"
+               aria-label="Previous page">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Prev
+            </a>
+            <a href="?page={{ page + 1 }}"
+               class="page-btn {% if page >= total_pages %}disabled{% endif %}"
+               aria-label="Next page">
+                Next
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+</main>
+
+</body>
+</html>
