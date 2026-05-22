@@ -632,3 +632,13 @@ td.col-desc {
 
 .view-link-alert { color: var(--red); }
 .view-link-alert:hover { color: var(--text); }
+
+.sev-critical {
+    color: var(--red);
+    background: var(--red-bg);
+    border: 1px solid var(--red-border);
+}
+
+.sev-critical .sev-dot {
+    background: var(--red);
+}

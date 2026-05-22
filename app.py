@@ -42,6 +42,16 @@ def init_db():
                 description TEXT
             )
         """)
+
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS alerts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ip_address TEXT,
+                alert_type TEXT,
+                severity TEXT,
+                description TEXT
+            )
+        """)
         db.commit()
 
 
@@ -76,6 +86,53 @@ def classify_event(line: str):
     else:
         return ip_address, "UNKNOWN",     "Low",    "Uncategorized",  "Unclassified security event"
 
+def generate_alerts():
+    db = get_db()
+
+    # Clear old alerts before rebuilding them
+    db.execute("DELETE FROM alerts")
+
+    # Brute force detection: 3+ failed logins from same IP
+    brute_force_results = db.execute("""
+        SELECT ip_address, COUNT(*) AS attempt_count
+        FROM events
+        WHERE event_type = 'FAILED_LOGIN'
+        GROUP BY ip_address
+        HAVING COUNT(*) >= 3
+    """).fetchall()
+
+    for row in brute_force_results:
+        db.execute("""
+            INSERT INTO alerts (ip_address, alert_type, severity, description)
+            VALUES (?, ?, ?, ?)
+        """, (
+            row["ip_address"],
+            "POSSIBLE_BRUTE_FORCE",
+            "Critical",
+            f"{row['attempt_count']} failed login attempts detected from {row['ip_address']}"
+        ))
+
+    # Port scan detection: 2+ port scan events from same IP
+    port_scan_results = db.execute("""
+        SELECT ip_address, COUNT(*) AS scan_count
+        FROM events
+        WHERE event_type = 'PORT_SCAN'
+        GROUP BY ip_address
+        HAVING COUNT(*) >= 2
+    """).fetchall()
+
+    for row in port_scan_results:
+        db.execute("""
+            INSERT INTO alerts (ip_address, alert_type, severity, description)
+            VALUES (?, ?, ?, ?)
+        """, (
+            row["ip_address"],
+            "POSSIBLE_PORT_SCAN",
+            "High",
+            f"{row['scan_count']} port scan events detected from {row['ip_address']}"
+        ))
+
+    db.commit()
 
 # ---------------------------------------------------------------------------
 # Routes
@@ -135,6 +192,7 @@ def upload_logs():
         inserted += 1
 
     db.commit()
+    generate_alerts()
     return redirect(f"/events?uploaded={inserted}")
 
 
@@ -177,9 +235,10 @@ def alerts():
     offset = (page - 1) * EVENTS_PER_PAGE
     db = get_db()
 
-    total = db.execute("SELECT COUNT(*) FROM events WHERE severity = 'High'").fetchone()[0]
+    total = db.execute("SELECT COUNT(*) FROM alerts").fetchone()[0]
+
     alert_rows = db.execute(
-        "SELECT * FROM events WHERE severity = 'High' ORDER BY id DESC LIMIT ? OFFSET ?",
+        "SELECT * FROM alerts ORDER BY id DESC LIMIT ? OFFSET ?",
         (EVENTS_PER_PAGE, offset),
     ).fetchall()
 
