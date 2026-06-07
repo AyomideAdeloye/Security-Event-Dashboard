@@ -103,14 +103,19 @@ def admin_required(f):
 
 def get_db():
     if "db" not in g:
-        g.db = psycopg2.connect(
-            host=os.environ["POSTGRES_HOST"],
-            port=os.environ.get("POSTGRES_PORT", 5432),
-            dbname=os.environ["POSTGRES_DB"],
-            user=os.environ["POSTGRES_USER"],
-            password=os.environ["POSTGRES_PASSWORD"],
-            cursor_factory=psycopg2.extras.RealDictCursor,
-        )
+        database_url = os.environ.get("DATABASE_URL")
+        if database_url:
+            g.db = psycopg2.connect(database_url,
+                cursor_factory=psycopg2.extras.RealDictCursor)
+        else:
+            g.db = psycopg2.connect(
+                host=os.environ["POSTGRES_HOST"],
+                port=os.environ.get("POSTGRES_PORT", 5432),
+                dbname=os.environ["POSTGRES_DB"],
+                user=os.environ["POSTGRES_USER"],
+                password=os.environ["POSTGRES_PASSWORD"],
+                cursor_factory=psycopg2.extras.RealDictCursor,
+            )
     return g.db
 
 

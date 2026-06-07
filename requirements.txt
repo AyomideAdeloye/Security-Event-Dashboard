@@ -5,3 +5,4 @@ bcrypt==4.2.1
 python-dotenv==1.0.1
 stripe==11.4.1
 resend==2.10.0
+gunicorn==21.2.0
