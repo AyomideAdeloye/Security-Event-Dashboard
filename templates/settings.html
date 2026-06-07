@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings — LogSentry</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .settings-grid { display:grid;gap:1.5rem;margin-top:1.25rem; }
+        .settings-card { background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:1.5rem; }
+        .settings-card-title { font-family:var(--mono);font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text);margin-bottom:.35rem; }
+        .settings-card-sub { font-size:.78rem;color:var(--text-muted);margin-bottom:1.25rem; }
+        .key-row { display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.65rem 0;border-bottom:1px solid var(--border); }
+        .key-row:last-child { border-bottom:none; }
+        .key-label { font-family:var(--mono);font-size:.75rem;color:var(--text); }
+        .key-date { font-family:var(--mono);font-size:.68rem;color:var(--text-dim); }
+        .delete-btn { font-family:var(--mono);font-size:.68rem;letter-spacing:.05em;text-transform:uppercase;background:none;border:1px solid var(--border-hover);color:var(--text-muted);padding:.28rem .65rem;border-radius:4px;cursor:pointer;transition:color .15s,border-color .15s; }
+        .delete-btn:hover { color:var(--red);border-color:rgba(240,82,82,.2); }
+        .inline-form { display:flex;gap:.65rem;align-items:center; }
+        .inline-input { background:var(--bg-surface);border:1px solid var(--border-hover);border-radius:6px;padding:.45rem .75rem;font-family:var(--mono);font-size:.75rem;color:var(--text);outline:none;transition:border-color .15s;min-width:220px; }
+        .inline-input:focus { border-color:var(--blue); }
+        .create-btn { font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;padding:.45rem 1rem;border-radius:6px;border:none;background:var(--blue);color:#0d1117;font-weight:500;cursor:pointer;transition:opacity .15s;white-space:nowrap; }
+        .create-btn:hover { opacity:.85; }
+        .usage-bar-wrap { background:var(--bg-surface);border-radius:100px;height:6px;overflow:hidden;margin:.75rem 0 .5rem; }
+        .usage-bar { height:100%;border-radius:100px;background:var(--blue);transition:width .3s; }
+        .usage-bar.near-limit { background:var(--amber); }
+        .usage-bar.at-limit   { background:var(--red); }
+        .usage-label { font-family:var(--mono);font-size:.72rem;color:var(--text-muted); }
+        .flash-api-key { font-family:var(--mono);font-size:.73rem;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:#34d399;border-radius:6px;padding:.6rem .9rem;margin-bottom:1.25rem;word-break:break-all; }
+        .flash-success { font-family:var(--mono);font-size:.73rem;color:#34d399;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);border-radius:6px;padding:.5rem .75rem;margin-bottom:1.25rem; }
+        .flash-error   { font-family:var(--mono);font-size:.73rem;color:var(--red);background:rgba(240,82,82,.08);border:1px solid rgba(240,82,82,.2);border-radius:6px;padding:.5rem .75rem;margin-bottom:1.25rem; }
+        .field { margin-bottom:1rem; }
+        .field label { display:block;font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.4rem; }
+        .field input[type=email] { width:100%;background:var(--bg-surface);border:1px solid var(--border-hover);border-radius:6px;padding:.5rem .75rem;font-family:var(--mono);font-size:.78rem;color:var(--text);outline:none;transition:border-color .15s; }
+        .field input[type=email]:focus { border-color:var(--blue); }
+        .toggle-row { display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem; }
+        .toggle-label { font-size:.82rem;color:var(--text-muted); }
+        .save-btn { font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;padding:.5rem 1.1rem;border-radius:6px;border:none;background:var(--blue);color:#0d1117;font-weight:500;cursor:pointer;transition:opacity .15s; }
+        .save-btn:hover { opacity:.85; }
+        .billing-btn { display:inline-flex;align-items:center;gap:.4rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;padding:.5rem 1rem;border-radius:6px;border:1px solid var(--border-hover);color:var(--text-muted);text-decoration:none;transition:color .15s,border-color .15s; }
+        .billing-btn:hover { color:var(--text);border-color:rgba(255,255,255,.2); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-left">
+        <div class="logo-mark" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L14 5.5V10.5L8 14L2 10.5V5.5L8 2Z" stroke="#0d0f12" stroke-width="1.5" fill="none"/><circle cx="8" cy="8" r="2" fill="#0d0f12"/></svg>
+        </div>
+        <h1>Security Dashboard</h1>
+    </div>
+    <div class="status-pill"><span class="status-dot"></span>Live</div>
+</header>
+
+<main>
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <a href="{{ url_for('index') }}" class="back-link">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Dashboard
+            </a>
+            <span class="section-label">/ Settings</span>
+        </div>
+        <span class="event-count">{{ current_user.email }}</span>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            {% if category == 'api_key' %}
+            <div class="flash-api-key">
+                ✓ New API key — copy it now, it won't be shown again:<br>
+                <strong>{{ message.split(':', 1)[1] }}</strong>
+            </div>
+            {% else %}
+            <div class="flash-{{ category }}">{{ message }}</div>
+            {% endif %}
+        {% endfor %}
+    {% endwith %}
+
+    <div class="settings-grid">
+
+        <!-- Usage -->
+        <div class="settings-card">
+            <div class="settings-card-title">Usage this month</div>
+            <div class="settings-card-sub">
+                You are on the <strong>{{ plan['name'] }}</strong> plan —
+                {% if plan['event_limit'] %}{{ "{:,}".format(plan['event_limit']) }} events/month.{% else %}unlimited events.{% endif %}
+            </div>
+            {% if plan['event_limit'] %}
+                {% set pct = [(usage_count / plan['event_limit'] * 100), 100] | min %}
+                <div class="usage-bar-wrap">
+                    <div class="usage-bar {% if pct >= 100 %}at-limit{% elif pct >= 80 %}near-limit{% endif %}" style="width:{{ pct }}%"></div>
+                </div>
+                <div class="usage-label">{{ "{:,}".format(usage_count) }} / {{ "{:,}".format(plan['event_limit']) }} events used this month</div>
+            {% else %}
+                <div class="usage-label">{{ "{:,}".format(usage_count) }} events used this month (unlimited)</div>
+            {% endif %}
+            <div style="margin-top:1.25rem;display:flex;gap:.65rem;flex-wrap:wrap;">
+                {% if org['plan'] == 'free' %}
+                <a href="{{ url_for('upgrade', plan_key='starter') }}" class="create-btn" style="text-decoration:none;">↑ Upgrade to Starter — $29/mo</a>
+                <a href="{{ url_for('upgrade', plan_key='pro') }}" class="billing-btn" style="text-decoration:none;">↑ Upgrade to Pro — $79/mo</a>
+                {% elif org['plan'] == 'starter' %}
+                <a href="{{ url_for('upgrade', plan_key='pro') }}" class="create-btn" style="text-decoration:none;">↑ Upgrade to Pro — $79/mo</a>
+                <a href="{{ url_for('billing_portal') }}" class="billing-btn" style="text-decoration:none;">Manage billing</a>
+                {% else %}
+                <a href="{{ url_for('billing_portal') }}" class="billing-btn" style="text-decoration:none;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    Manage billing
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Email alerts -->
+        <div class="settings-card">
+            <div class="settings-card-title">Email alerts</div>
+            <div class="settings-card-sub">Get notified when a high-severity event is detected.</div>
+            <form method="POST" action="{{ url_for('update_alert_settings') }}">
+                <div class="field">
+                    <label for="alert_email">Alert email address</label>
+                    <input type="email" id="alert_email" name="alert_email"
+                           value="{{ alert_settings['alert_email'] if alert_settings and alert_settings['alert_email'] else current_user.email }}"
+                           placeholder="{{ current_user.email }}">
+                </div>
+                <div class="toggle-row">
+                    <span class="toggle-label">Enable email alerts</span>
+                    <input type="checkbox" name="alerts_enabled"
+                           {% if not alert_settings or alert_settings['alerts_enabled'] %}checked{% endif %}>
+                </div>
+                <button type="submit" class="save-btn">Save</button>
+            </form>
+        </div>
+
+        <!-- API Keys -->
+        <div class="settings-card">
+            <div class="settings-card-title">API keys</div>
+            <div class="settings-card-sub">Use these to push logs from your servers via <code style="font-family:var(--mono);font-size:.75rem;">POST /api/ingest</code>.</div>
+            <form method="POST" action="{{ url_for('create_api_key') }}" class="inline-form" style="margin-bottom:1.25rem;">
+                <input type="text" name="label" class="inline-input" placeholder="e.g. production-server">
+                <button type="submit" class="create-btn">Generate</button>
+            </form>
+            {% if api_keys %}
+                {% for key in api_keys %}
+                <div class="key-row">
+                    <div>
+                        <div class="key-label">{{ key['label'] or 'Unnamed key' }}</div>
+                        <div class="key-date">Created {{ key['created_at'].strftime('%d %b %Y') }}</div>
+                    </div>
+                    <form method="POST" action="{{ url_for('delete_api_key', key_id=key['id']) }}"
+                          onsubmit="return confirm('Revoke this key? Servers using it will stop ingesting.')">
+                        <button type="submit" class="delete-btn">Revoke</button>
+                    </form>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div style="font-size:.78rem;color:var(--text-dim);padding:.5rem 0;">No API keys yet.</div>
+            {% endif %}
+        </div>
+
+        <!-- Account -->
+        <div class="settings-card">
+            <div class="settings-card-title">Account</div>
+            <div class="settings-card-sub">Signed in as <strong>{{ current_user.email }}</strong> &mdash; role: {{ current_user.role }}.</div>
+            <a href="{{ url_for('logout') }}" class="clear-btn" style="display:inline-block;text-decoration:none;">Log out</a>
+        </div>
+
+    </div>
+</main>
+
+</body>
+</html>

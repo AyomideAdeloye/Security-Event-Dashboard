@@ -633,12 +633,67 @@ td.col-desc {
 .view-link-alert { color: var(--red); }
 .view-link-alert:hover { color: var(--text); }
 
-.sev-critical {
-    color: var(--red);
-    background: var(--red-bg);
-    border: 1px solid var(--red-border);
+/* ============================================================
+   SaaS additions
+   ============================================================ */
+
+/* Header right group */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
 }
 
-.sev-critical .sev-dot {
-    background: var(--red);
+.settings-link {
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    transition: color 0.15s;
 }
+
+.settings-link:hover { color: var(--text); }
+
+/* Usage bar in header */
+.usage-bar-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.usage-bar-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.usage-bar-track {
+    flex: 1;
+    background: var(--bg-surface);
+    border-radius: 100px;
+    height: 4px;
+    overflow: hidden;
+}
+
+.usage-bar-fill {
+    height: 100%;
+    border-radius: 100px;
+    background: var(--blue);
+    transition: width 0.3s;
+}
+
+.usage-bar-fill.near-limit { background: var(--amber); }
+
+/* Flash banners */
+.flash-banner {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    border-radius: 6px;
+    padding: 0.5rem 0.9rem;
+    margin-bottom: 1.25rem;
+}
+
+.flash-error   { color: var(--red);   background: var(--red-bg);   border: 1px solid var(--red-border); }
+.flash-success { color: var(--green); background: var(--green-bg); border: 1px solid var(--green-border); }
+.flash-warning { color: var(--amber); background: var(--amber-bg); border: 1px solid var(--amber-border); }

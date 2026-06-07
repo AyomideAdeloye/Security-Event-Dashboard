@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign up — LogSentry</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .auth-wrap {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .auth-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 420px;
+        }
+        .auth-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            margin-bottom: 2rem;
+        }
+        .auth-logo .logo-mark { width: 28px; height: 28px; background: var(--red); border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+        .auth-title {
+            font-family: var(--mono);
+            font-size: 0.875rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text);
+        }
+        .auth-heading {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 0.4rem;
+        }
+        .auth-sub {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 1.75rem;
+        }
+        .field { margin-bottom: 1.1rem; }
+        .field label {
+            display: block;
+            font-family: var(--mono);
+            font-size: 0.68rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+        }
+        .field input {
+            width: 100%;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-hover);
+            border-radius: 6px;
+            padding: 0.55rem 0.75rem;
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .field input:focus { border-color: var(--blue); }
+        .submit-btn {
+            width: 100%;
+            font-family: var(--mono);
+            font-size: 0.78rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 0.65rem;
+            border-radius: 6px;
+            border: none;
+            background: var(--blue);
+            color: #0d1117;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.15s;
+            margin-top: 0.5rem;
+        }
+        .submit-btn:hover { opacity: 0.85; }
+        .auth-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+        .auth-footer a { color: var(--blue); text-decoration: none; }
+        .auth-footer a:hover { text-decoration: underline; }
+        .flash-error, .flash-success {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+        .flash-error   { color: var(--red);   background: var(--red-bg);   border: 1px solid var(--red-border); }
+        .flash-success { color: var(--green); background: var(--green-bg); border: 1px solid var(--green-border); }
+    </style>
+</head>
+<body>
+<div class="auth-wrap">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <div class="logo-mark">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 2L14 5.5V10.5L8 14L2 10.5V5.5L8 2Z" stroke="#0d0f12" stroke-width="1.5" fill="none"/><circle cx="8" cy="8" r="2" fill="#0d0f12"/></svg>
+            </div>
+            <span class="auth-title">LogSentry</span>
+        </div>
+
+        <div class="auth-heading">Create your account</div>
+        <div class="auth-sub">Free up to {{ config.get('FREE_TIER_LIMIT', 1000) | default(1000) }} events/month. No credit card required.</div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST">
+            <div class="field">
+                <label for="org_name">Organisation name</label>
+                <input type="text" id="org_name" name="org_name" placeholder="Acme Inc." required autofocus>
+            </div>
+            <div class="field">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="you@example.com" required>
+            </div>
+            <div class="field">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Min. 8 characters" required minlength="8">
+            </div>
+            <button type="submit" class="submit-btn">Create account</button>
+        </form>
+
+        <div class="auth-footer">
+            Already have an account? <a href="{{ url_for('login') }}">Log in</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,4 +1,7 @@
+.env
 __pycache__/
 *.pyc
-security_events.db
-.env
+*.pyo
+.venv/
+venv/
+*.db
