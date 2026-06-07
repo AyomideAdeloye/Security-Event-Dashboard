@@ -706,12 +706,51 @@ def api_ingest():
     return {"inserted": inserted}, 201
 
 # ---------------------------------------------------------------------------
-# Landing page
+# Landing page + waitlist
 # ---------------------------------------------------------------------------
 
 @app.route("/home")
 def landing():
     return render_template("landing.html", plans=PLANS)
+
+
+@app.route("/waitlist", methods=["POST"])
+def waitlist_signup():
+    data  = request.get_json(silent=True)
+    email = (data.get("email") or "").strip().lower() if data else ""
+    if not email or "@" not in email:
+        return jsonify(error="Please enter a valid email address."), 400
+    db = get_db()
+    existing = query_one(db, "SELECT id FROM waitlist WHERE email = %s", (email,))
+    if existing:
+        return jsonify(error="You're already on the list!"), 409
+    execute(db, "INSERT INTO waitlist (email) VALUES (%s)", (email,))
+    # Send confirmation email
+    if resend.api_key:
+        try:
+            resend.Emails.send({
+                "from": ALERT_FROM_EMAIL,
+                "to":   [email],
+                "subject": "You're on the LogSentry waitlist!",
+                "html": """
+                    <div style="font-family:sans-serif;background:#0d0f12;color:#e8eaf0;padding:32px;border-radius:8px;max-width:480px;">
+                        <h2 style="color:#60a5fa;margin-top:0;">You're on the list 🎉</h2>
+                        <p>Thanks for joining the LogSentry waitlist. We're putting the finishing touches on the product and will email you the moment we launch.</p>
+                        <p style="margin-top:16px;"><strong>Early access perk:</strong> the first wave of signups gets 3 months of Starter free ($87 value).</p>
+                        <p style="color:#6b7280;font-size:14px;margin-top:24px;">— The LogSentry team</p>
+                    </div>
+                """,
+            })
+        except Exception as e:
+            app.logger.error(f"Waitlist confirmation email failed: {e}")
+    return jsonify(ok=True), 201
+
+
+@app.route("/waitlist/count")
+def waitlist_count():
+    db  = get_db()
+    row = query_one(db, "SELECT COUNT(*) AS n FROM waitlist")
+    return jsonify(count=row["n"] if row else 0)
 
 # ---------------------------------------------------------------------------
 # Entry point

@@ -274,6 +274,42 @@
 
         footer p { font-size: 0.75rem; color: var(--text-dim); }
 
+        /* ── Waitlist ── */
+        .waitlist-section {
+            max-width: 560px; margin: 0 auto; padding: 0 2rem 5rem; text-align: center;
+        }
+        .waitlist-card {
+            background: var(--bg-card); border: 1px solid rgba(96,165,250,0.2);
+            border-radius: 12px; padding: 2.5rem;
+            box-shadow: 0 0 40px rgba(96,165,250,0.05);
+        }
+        .waitlist-title { font-size: 1.2rem; font-weight: 600; margin-bottom: .5rem; }
+        .waitlist-sub   { font-size: .85rem; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6; }
+        .waitlist-form  { display: flex; gap: .65rem; }
+        .waitlist-input {
+            flex: 1; background: var(--bg-surface); border: 1px solid rgba(255,255,255,0.13);
+            border-radius: 6px; padding: .6rem .85rem; font-family: var(--sans);
+            font-size: .85rem; color: var(--text); outline: none; transition: border-color .15s;
+        }
+        .waitlist-input:focus { border-color: var(--blue); }
+        .waitlist-btn {
+            font-family: var(--mono); font-size: .75rem; letter-spacing: .06em;
+            text-transform: uppercase; padding: .6rem 1.25rem; border-radius: 6px;
+            border: none; background: var(--blue); color: #0d1117; font-weight: 500;
+            cursor: pointer; transition: opacity .15s; white-space: nowrap;
+        }
+        .waitlist-btn:hover { opacity: .85; }
+        .waitlist-count {
+            margin-top: 1rem; font-family: var(--mono); font-size: .7rem;
+            color: var(--text-dim); letter-spacing: .05em;
+        }
+        .waitlist-success {
+            background: rgba(52,211,153,.08); border: 1px solid rgba(52,211,153,.2);
+            color: #34d399; border-radius: 8px; padding: .75rem 1rem;
+            font-family: var(--mono); font-size: .78rem; margin-top: 1rem;
+            display: none;
+        }
+
         /* ── Responsive ── */
         @media (max-width: 700px) {
             .features-grid { grid-template-columns: 1fr; }
@@ -281,6 +317,7 @@
             .preview-metrics { grid-template-columns: repeat(2,1fr); }
             nav { padding: 1rem; }
             .nav-links .nav-link { display: none; }
+            .waitlist-form { flex-direction: column; }
         }
     </style>
 </head>
@@ -310,11 +347,15 @@
     </div>
     <h1>Security event monitoring<br><span>built for startups</span></h1>
     <p>Upload your server logs, get instant visibility into failed logins, port scans, and anomalies. Pay only for what you use.</p>
-    <div class="hero-actions">
-        <a href="{{ url_for('signup') }}" class="btn-primary">Start for free</a>
+    <form class="waitlist-form" id="hero-waitlist" style="max-width:440px;margin:0 auto" onsubmit="submitWaitlist(event, 'hero-waitlist')">
+        <input type="email" class="waitlist-input" placeholder="your@email.com" required>
+        <button type="submit" class="waitlist-btn">Join waitlist</button>
+    </form>
+    <div class="waitlist-success" id="hero-waitlist-success">✓ You're on the list! We'll email you when we launch.</div>
+    <p class="hero-sub" style="margin-top:1rem">Free up to 500 events/month &mdash; no credit card required</p>
+    <div style="margin-top:2rem;">
         <a href="#features" class="btn-secondary">See how it works</a>
     </div>
-    <p class="hero-sub">Free up to 500 events/month &mdash; no credit card required</p>
 </section>
 
 <!-- Dashboard preview -->
@@ -415,7 +456,7 @@
         </div>
         <div class="pricing-card featured">
             <div class="pricing-tier" style="color:var(--blue)">Starter</div>
-            <div class="pricing-price">$39 <span>/ month</span></div>
+            <div class="pricing-price">$29 <span>/ month</span></div>
             <div class="pricing-desc">For growing startups with real production workloads.</div>
             <ul class="pricing-features">
                 <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>50,000 events / month</li>
@@ -427,7 +468,7 @@
         </div>
         <div class="pricing-card">
             <div class="pricing-tier">Pro</div>
-            <div class="pricing-price">$99 <span>/ month</span></div>
+            <div class="pricing-price">$79 <span>/ month</span></div>
             <div class="pricing-desc">For teams that need unlimited scale and full visibility.</div>
             <ul class="pricing-features">
                 <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Unlimited events</li>
@@ -440,15 +481,21 @@
         </div>
     </div>
     <p style="text-align:center;margin-top:1.5rem;font-size:.8rem;color:var(--text-muted)">
-        <a href="{{ url_for('pricing_page') }}" style="color:var(--blue);text-decoration:none;">See full pricing details →</a>
     </p>
 </section>
 
-<!-- CTA strip -->
-<div class="cta-strip">
-    <h2>Ready to get started?</h2>
-    <p>Set up in minutes. No credit card required.</p>
-    <a href="{{ url_for('signup') }}" class="btn-primary">Create your free account</a>
+<!-- Waitlist section -->
+<div class="waitlist-section" id="waitlist">
+    <div class="waitlist-card">
+        <div class="waitlist-title">Get early access</div>
+        <div class="waitlist-sub">LogSentry is launching soon. Join the waitlist and be first to know — early members get 3 months of Starter free.</div>
+        <form class="waitlist-form" id="bottom-waitlist" onsubmit="submitWaitlist(event, 'bottom-waitlist')">
+            <input type="email" class="waitlist-input" placeholder="your@email.com" required>
+            <button type="submit" class="waitlist-btn">Join waitlist</button>
+        </form>
+        <div class="waitlist-success" id="bottom-waitlist-success">✓ You're on the list! We'll email you when we launch.</div>
+        <div class="waitlist-count" id="waitlist-count">Loading signups...</div>
+    </div>
 </div>
 
 <!-- Footer -->
@@ -462,5 +509,47 @@
     <p>Built for startups. Priced fairly.</p>
 </footer>
 
+<script>
+async function submitWaitlist(e, formId) {
+    e.preventDefault();
+    const form    = document.getElementById(formId);
+    const email   = form.querySelector('input[type=email]').value;
+    const success = document.getElementById(formId + '-success');
+    const btn     = form.querySelector('button');
+    btn.disabled  = true;
+    btn.textContent = 'Joining...';
+    try {
+        const res = await fetch('/waitlist', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({email})
+        });
+        const data = await res.json();
+        if (res.ok) {
+            form.style.display = 'none';
+            success.style.display = 'block';
+            loadCount();
+        } else {
+            btn.disabled = false;
+            btn.textContent = 'Join waitlist';
+            alert(data.error || 'Something went wrong.');
+        }
+    } catch {
+        btn.disabled = false;
+        btn.textContent = 'Join waitlist';
+    }
+}
+
+async function loadCount() {
+    try {
+        const res  = await fetch('/waitlist/count');
+        const data = await res.json();
+        const el   = document.getElementById('waitlist-count');
+        if (el) el.textContent = data.count + ' people already on the list';
+    } catch {}
+}
+
+loadCount();
+</script>
 </body>
 </html>
