@@ -711,6 +711,23 @@ def api_ingest():
     return {"inserted": inserted}, 201
 
 # ---------------------------------------------------------------------------
+# Agent download
+# ---------------------------------------------------------------------------
+
+@app.route("/agent")
+@login_required
+def agent_install():
+    return render_template("agent.html")
+
+
+@app.route("/agent/download")
+def download_agent():
+    from flask import send_file
+    agent_path = os.path.join(os.path.dirname(__file__), "logsentry-agent.py")
+    return send_file(agent_path, as_attachment=True, download_name="logsentry-agent.py")
+
+
+# ---------------------------------------------------------------------------
 # Landing page + waitlist
 # ---------------------------------------------------------------------------
 

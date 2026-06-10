@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Install Agent — LogSentry</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .install-wrap { max-width: 720px; margin: 0 auto; padding: 2rem; }
+        .install-header { margin-bottom: 2.5rem; }
+        .install-header h2 { font-size: 1.25rem; font-weight: 500; margin-bottom: .4rem; }
+        .install-header p  { font-size: .85rem; color: var(--text-muted); line-height: 1.6; }
+        .step { margin-bottom: 2rem; }
+        .step-num {
+            font-family: var(--mono); font-size: .68rem; letter-spacing: .1em;
+            text-transform: uppercase; color: var(--blue); margin-bottom: .5rem;
+        }
+        .step h3 { font-size: .95rem; font-weight: 500; margin-bottom: .5rem; }
+        .step p  { font-size: .82rem; color: var(--text-muted); line-height: 1.6; margin-bottom: .75rem; }
+        .code-block {
+            background: var(--bg-surface); border: 1px solid var(--border);
+            border-radius: 8px; padding: 1rem 1.25rem; position: relative;
+        }
+        .code-block pre {
+            font-family: var(--mono); font-size: .78rem; color: var(--text);
+            white-space: pre-wrap; word-break: break-all; margin: 0;
+        }
+        .copy-btn {
+            position: absolute; top: .65rem; right: .65rem;
+            font-family: var(--mono); font-size: .65rem; letter-spacing: .05em;
+            text-transform: uppercase; background: var(--bg-card);
+            border: 1px solid var(--border-hover); color: var(--text-muted);
+            padding: .25rem .6rem; border-radius: 4px; cursor: pointer;
+            transition: color .15s, border-color .15s;
+        }
+        .copy-btn:hover { color: var(--text); border-color: var(--blue); }
+        .divider { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+        .note {
+            background: rgba(96,165,250,.06); border: 1px solid rgba(96,165,250,.15);
+            border-radius: 8px; padding: 1rem 1.25rem;
+            font-size: .8rem; color: var(--text-muted); line-height: 1.6;
+        }
+        .note strong { color: var(--blue); }
+        .download-btn {
+            display: inline-flex; align-items: center; gap: .45rem;
+            font-family: var(--mono); font-size: .75rem; letter-spacing: .06em;
+            text-transform: uppercase; padding: .6rem 1.25rem; border-radius: 6px;
+            border: none; background: var(--blue); color: #0d1117; font-weight: 500;
+            text-decoration: none; transition: opacity .15s; margin-bottom: 1rem;
+        }
+        .download-btn:hover { opacity: .85; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-left">
+        <div class="logo-mark" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L14 5.5V10.5L8 14L2 10.5V5.5L8 2Z" stroke="#0d0f12" stroke-width="1.5" fill="none"/><circle cx="8" cy="8" r="2" fill="#0d0f12"/></svg>
+        </div>
+        <h1>Security Dashboard</h1>
+    </div>
+    <div class="status-pill"><span class="status-dot"></span>Live</div>
+</header>
+
+<div class="install-wrap">
+    <div class="top-bar" style="margin-bottom:2rem;">
+        <div class="top-bar-left">
+            <a href="{{ url_for('index') }}" class="back-link">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Dashboard
+            </a>
+            <span class="section-label">/ Install Agent</span>
+        </div>
+    </div>
+
+    <div class="install-header">
+        <h2>Install the LogSentry agent</h2>
+        <p>The agent runs on your Linux server, watches your log files, and automatically ships new events to LogSentry every 5 seconds. No manual uploads needed.</p>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="step">
+        <div class="step-num">Step 1</div>
+        <h3>Generate an API key</h3>
+        <p>Go to Settings and generate an API key. You'll need it in the next step.</p>
+        <a href="{{ url_for('settings') }}" class="download-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            Go to Settings
+        </a>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Step 2 -->
+    <div class="step">
+        <div class="step-num">Step 2</div>
+        <h3>Download the agent on your server</h3>
+        <p>SSH into your Linux server and run:</p>
+        <div class="code-block">
+            <pre>curl -O https://security-event-dashboard-production.up.railway.app/agent/download
+mv download logsentry-agent.py</pre>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Step 3 -->
+    <div class="step">
+        <div class="step-num">Step 3</div>
+        <h3>Install the dependency</h3>
+        <div class="code-block">
+            <pre>pip3 install requests</pre>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Step 4 -->
+    <div class="step">
+        <div class="step-num">Step 4</div>
+        <h3>Run the agent</h3>
+        <p>Replace <code style="font-family:var(--mono);font-size:.8rem;color:var(--blue)">YOUR_API_KEY</code> with the key from Step 1:</p>
+        <div class="code-block">
+            <pre>python3 logsentry-agent.py --key YOUR_API_KEY</pre>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <p style="margin-top:.75rem;">The agent will start watching your log files and shipping events automatically.</p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Step 5 - optional -->
+    <div class="step">
+        <div class="step-num">Step 5 — Optional</div>
+        <h3>Install as a background service</h3>
+        <p>To run the agent automatically on boot (recommended for production):</p>
+        <div class="code-block">
+            <pre>sudo python3 logsentry-agent.py --key YOUR_API_KEY --install</pre>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <p style="margin-top:.75rem;">This installs a systemd service that starts automatically and restarts if it crashes.</p>
+    </div>
+
+    <hr class="divider">
+
+    <div class="note">
+        <strong>Which log files does the agent watch?</strong><br>
+        By default it watches <code style="font-family:var(--mono);font-size:.78rem;">/var/log/auth.log</code>, <code style="font-family:var(--mono);font-size:.78rem;">/var/log/syslog</code>, and common web server logs. To watch custom files, use the <code style="font-family:var(--mono);font-size:.78rem;">--files</code> flag:<br><br>
+        <code style="font-family:var(--mono);font-size:.78rem;">python3 logsentry-agent.py --key YOUR_KEY --files /var/log/myapp.log /var/log/auth.log</code>
+    </div>
+</div>
+
+<script>
+function copyCode(btn) {
+    const pre = btn.parentElement.querySelector('pre');
+    navigator.clipboard.writeText(pre.textContent.trim());
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 2000);
+}
+</script>
+
+</body>
+</html>

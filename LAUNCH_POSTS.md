@@ -29,7 +29,7 @@ The product is built and working locally. Before I spend money on hosting and in
 
 If you're a founder or developer who's ever thought "I should probably be monitoring my server logs but it's too expensive/complicated" — that's exactly who I built this for.
 
-Waitlist: [YOUR LANDING PAGE URL]
+Waitlist: [security-event-dashboard-production.up.railway.app]
 
 Happy to answer any questions about the build or the idea. Brutal feedback welcome — I'd rather know now if this is a bad idea than after I've spent 3 months marketing it.
 
