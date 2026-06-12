@@ -711,6 +711,34 @@ def api_ingest():
     return {"inserted": inserted}, 201
 
 # ---------------------------------------------------------------------------
+# Error handlers
+# ---------------------------------------------------------------------------
+
+def error_page(code, title, description):
+    return render_template("error.html", code=code, title=title, description=description), code
+
+@app.errorhandler(400)
+def bad_request(e):
+    return error_page(400, "Bad request", str(e.description) if hasattr(e, 'description') else "The request could not be understood.")
+
+@app.errorhandler(401)
+def unauthorized(e):
+    return error_page(401, "Unauthorized", "You need to log in to access this page.")
+
+@app.errorhandler(403)
+def forbidden(e):
+    return error_page(403, "Forbidden", "You don't have permission to access this page.")
+
+@app.errorhandler(404)
+def not_found(e):
+    return error_page(404, "Page not found", "The page you're looking for doesn't exist or has been moved.")
+
+@app.errorhandler(413)
+def too_large(e):
+    return error_page(413, "File too large", "The file you uploaded exceeds the size limit. Please upload a smaller file or use the API agent instead.")
+
+
+# ---------------------------------------------------------------------------
 # Agent download
 # ---------------------------------------------------------------------------
 

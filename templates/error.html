@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ code }} — LogSentry</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .error-wrap {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .error-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 3rem 2.5rem;
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+        }
+        .error-code {
+            font-family: var(--mono);
+            font-size: 3.5rem;
+            font-weight: 500;
+            color: var(--red);
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+        .error-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: .5rem;
+        }
+        .error-desc {
+            font-size: .82rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+        .error-actions {
+            display: flex;
+            gap: .65rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn-back {
+            font-family: var(--mono);
+            font-size: .72rem;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            padding: .55rem 1.25rem;
+            border-radius: 6px;
+            border: none;
+            background: var(--blue);
+            color: #0d1117;
+            font-weight: 500;
+            text-decoration: none;
+            transition: opacity .15s;
+        }
+        .btn-back:hover { opacity: .85; }
+        .btn-home {
+            font-family: var(--mono);
+            font-size: .72rem;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            padding: .55rem 1.25rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-hover);
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color .15s, border-color .15s;
+        }
+        .btn-home:hover { color: var(--text); border-color: rgba(255,255,255,.2); }
+    </style>
+</head>
+<body>
+<div class="error-wrap">
+    <div class="error-card">
+        <div class="error-code">{{ code }}</div>
+        <div class="error-title">{{ title }}</div>
+        <div class="error-desc">{{ description }}</div>
+        <div class="error-actions">
+            <a href="javascript:history.back()" class="btn-back">Go back</a>
+            <a href="{{ url_for('index') }}" class="btn-home">Dashboard</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
