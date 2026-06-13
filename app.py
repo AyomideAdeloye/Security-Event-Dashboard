@@ -307,7 +307,7 @@ def extract_account(line):
     match = re.search(r'Account Name:\s+(\S+)', line)
     if match:
         return match.group(1)
-    match = re.search(r'Security ID:\s+\S+\(\S+)', line)
+    match = re.search(r'Security ID:[^\\]*\\([^\\]+)', line)
     if match:
         return match.group(1)
     return "Unknown"
