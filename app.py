@@ -294,24 +294,229 @@ def process_alerts(db, org_id, inserted_ids):
 # Log parsing
 # ---------------------------------------------------------------------------
 
+def extract_ip(line):
+    """Try to extract an IP address from a log line."""
+    import re
+    match = re.search(r'(\d{1,3}(?:\.\d{1,3}){3})', line)
+    return match.group(1) if match else "Unknown"
+
+
+def extract_account(line):
+    """Extract account name from Windows event logs."""
+    import re
+    match = re.search(r'Account Name:\s+(\S+)', line)
+    if match:
+        return match.group(1)
+    match = re.search(r'Security ID:\s+\S+\(\S+)', line)
+    if match:
+        return match.group(1)
+    return "Unknown"
+
+
 def classify_event(line: str):
+    """
+    Classify a single log line from multiple formats:
+    - Windows Event Viewer exports
+    - Linux syslog / auth.log
+    - Nginx / Apache access logs
+    - Generic application logs
+    """
     line = line.strip()
     if not line:
         return None
-    parts      = line.split()
-    ip_address = parts[0] if parts else "Unknown"
-    if "FAILED_LOGIN" in line:
-        return ip_address, "FAILED_LOGIN", "High",   "Authentication", "Possible brute force or unauthorized login attempt"
-    elif "PORT_SCAN" in line:
-        return ip_address, "PORT_SCAN",   "High",   "Network",        "Possible network reconnaissance activity"
-    elif "AUTH_SUCCESS" in line:
-        return ip_address, "AUTH_SUCCESS","Low",    "Authentication", "Successful login event"
-    elif "ERROR" in line:
-        return ip_address, "ERROR",       "Medium", "System",         "System error detected"
-    elif "WARNING" in line:
-        return ip_address, "WARNING",     "Medium", "System",         "Warning event detected"
-    else:
-        return ip_address, "UNKNOWN",     "Low",    "Uncategorized",  "Unclassified security event"
+
+    upper = line.upper()
+    ip    = extract_ip(line)
+
+    # ── Windows Event IDs ──────────────────────────────────────────────────
+
+    # 4625 = Failed logon
+    if "4625" in line:
+        account = extract_account(line)
+        return ip, "FAILED_LOGIN", "High", "Authentication", f"Windows failed logon — account: {account}"
+
+    # 4648 = Logon using explicit credentials (potential lateral movement)
+    if "4648" in line:
+        account = extract_account(line)
+        return ip, "EXPLICIT_CREDENTIALS", "High", "Authentication", f"Logon with explicit credentials — account: {account}"
+
+    # 4719 = System audit policy changed
+    if "4719" in line:
+        return ip, "AUDIT_POLICY_CHANGE", "High", "Policy", "System audit policy was changed"
+
+    # 4720 = User account created
+    if "4720" in line:
+        account = extract_account(line)
+        return ip, "ACCOUNT_CREATED", "Medium", "Account Management", f"New user account created: {account}"
+
+    # 4722 = User account enabled
+    if "4722" in line:
+        account = extract_account(line)
+        return ip, "ACCOUNT_ENABLED", "Low", "Account Management", f"User account enabled: {account}"
+
+    # 4723/4724 = Password change attempt
+    if "4723" in line or "4724" in line:
+        account = extract_account(line)
+        return ip, "PASSWORD_CHANGE", "Medium", "Account Management", f"Password change attempt — account: {account}"
+
+    # 4725 = User account disabled
+    if "4725" in line:
+        account = extract_account(line)
+        return ip, "ACCOUNT_DISABLED", "Medium", "Account Management", f"User account disabled: {account}"
+
+    # 4726 = User account deleted
+    if "4726" in line:
+        account = extract_account(line)
+        return ip, "ACCOUNT_DELETED", "High", "Account Management", f"User account deleted: {account}"
+
+    # 4740 = Account lockout
+    if "4740" in line:
+        account = extract_account(line)
+        return ip, "ACCOUNT_LOCKOUT", "High", "Authentication", f"Account locked out: {account}"
+
+    # 4756/4757 = Member added/removed from security group
+    if "4756" in line:
+        return ip, "GROUP_MEMBER_ADDED", "Medium", "Account Management", "Member added to security-enabled group"
+    if "4757" in line:
+        return ip, "GROUP_MEMBER_REMOVED", "Medium", "Account Management", "Member removed from security-enabled group"
+
+    # 4771 = Kerberos pre-auth failed
+    if "4771" in line:
+        account = extract_account(line)
+        return ip, "KERBEROS_FAILURE", "High", "Authentication", f"Kerberos pre-authentication failed — account: {account}"
+
+    # 4776 = NTLM auth attempt
+    if "4776" in line and "Audit Failure" in line:
+        account = extract_account(line)
+        return ip, "NTLM_FAILURE", "High", "Authentication", f"NTLM authentication failed — account: {account}"
+
+    # 4672 = Special privileges assigned (admin logon)
+    if "4672" in line:
+        account = extract_account(line)
+        return ip, "PRIVILEGED_LOGON", "Medium", "Authentication", f"Special privileges assigned to new logon — account: {account}"
+
+    # 4624 = Successful logon
+    if "4624" in line:
+        account = extract_account(line)
+        return ip, "AUTH_SUCCESS", "Low", "Authentication", f"Successful Windows logon — account: {account}"
+
+    # 4634/4647 = Logoff
+    if "4634" in line or "4647" in line:
+        return ip, "LOGOFF", "Low", "Authentication", "User logged off"
+
+    # 4688 = New process created (potential execution)
+    if "4688" in line:
+        import re
+        proc = re.search(r'Process Name:\s+(.+)', line)
+        proc_name = proc.group(1).strip() if proc else "Unknown"
+        return ip, "PROCESS_CREATED", "Low", "System", f"New process created: {proc_name}"
+
+    # 4698/4702 = Scheduled task created/modified
+    if "4698" in line or "4702" in line:
+        return ip, "SCHEDULED_TASK", "Medium", "System", "Scheduled task created or modified"
+
+    # 4732 = Member added to local admin group
+    if "4732" in line:
+        return ip, "ADMIN_GROUP_CHANGE", "High", "Account Management", "Member added to local Administrators group"
+
+    # 4799 = Security group enumeration
+    if "4799" in line:
+        account = extract_account(line)
+        return ip, "GROUP_ENUMERATION", "Low", "Reconnaissance", f"Security group membership enumerated by: {account}"
+
+    # 1102 = Audit log cleared
+    if "1102" in line:
+        return ip, "LOG_CLEARED", "High", "Tampering", "Security audit log was cleared — possible cover-up attempt"
+
+    # 7045 = New service installed
+    if "7045" in line:
+        return ip, "SERVICE_INSTALLED", "High", "System", "A new service was installed on the system"
+
+    # ── Windows audit keywords ─────────────────────────────────────────────
+
+    if "AUDIT FAILURE" in upper:
+        account = extract_account(line)
+        return ip, "AUDIT_FAILURE", "High", "Authentication", f"Windows audit failure — account: {account}"
+
+    if "AUDIT SUCCESS" in upper:
+        return ip, "AUDIT_SUCCESS", "Low", "Authentication", "Windows audit success event"
+
+    # ── Linux auth.log patterns ────────────────────────────────────────────
+
+    if "FAILED PASSWORD" in upper or "AUTHENTICATION FAILURE" in upper:
+        import re
+        user = re.search(r'(?:for|user)\s+(\S+)', line, re.IGNORECASE)
+        account = user.group(1) if user else "Unknown"
+        return ip, "FAILED_LOGIN", "High", "Authentication", f"SSH failed password — user: {account}"
+
+    if "INVALID USER" in upper or "ILLEGAL USER" in upper:
+        import re
+        user = re.search(r'(?:invalid user|illegal user)\s+(\S+)', line, re.IGNORECASE)
+        account = user.group(1) if user else "Unknown"
+        return ip, "INVALID_USER", "High", "Authentication", f"SSH login attempt with invalid user: {account}"
+
+    if "ACCEPTED PASSWORD" in upper or "ACCEPTED PUBLICKEY" in upper:
+        import re
+        user = re.search(r'for\s+(\S+)', line, re.IGNORECASE)
+        account = user.group(1) if user else "Unknown"
+        return ip, "AUTH_SUCCESS", "Low", "Authentication", f"SSH login successful — user: {account}"
+
+    if "CONNECTION CLOSED BY AUTHENTICATING USER" in upper:
+        return ip, "FAILED_LOGIN", "Medium", "Authentication", "SSH connection closed before authentication completed"
+
+    if "DID NOT RECEIVE IDENTIFICATION" in upper:
+        return ip, "SCAN_PROBE", "Medium", "Network", "Port probe — no SSH identification received"
+
+    if "SUDO" in upper and "COMMAND" in upper:
+        import re
+        cmd = re.search(r'COMMAND=(.*)', line)
+        cmd_str = cmd.group(1).strip() if cmd else "Unknown"
+        return ip, "SUDO_COMMAND", "Medium", "Privilege Escalation", f"Sudo command executed: {cmd_str}"
+
+    if "SUDO" in upper and ("INCORRECT PASSWORD" in upper or "3 INCORRECT" in upper):
+        return ip, "SUDO_FAILURE", "High", "Privilege Escalation", "Failed sudo attempt — incorrect password"
+
+    # ── Nginx / Apache access log patterns ────────────────────────────────
+
+    import re
+    http_match = re.search(r'"(?:GET|POST|PUT|DELETE|HEAD|OPTIONS)\s+(\S+)\s+HTTP', line)
+    if http_match:
+        status_match = re.search(r'HTTP/\d\.\d"\s+(\d{3})', line)
+        status = status_match.group(1) if status_match else "000"
+        path   = http_match.group(1)
+
+        # SQL injection / path traversal patterns
+        sqli_patterns = ["'", "UNION SELECT", "DROP TABLE", "../", "%2e%2e", "etc/passwd"]
+        if any(p.lower() in line.lower() for p in sqli_patterns):
+            return ip, "INJECTION_ATTEMPT", "High", "Web Attack", f"Possible injection attempt on {path}"
+
+        if status.startswith("4"):
+            return ip, "HTTP_ERROR", "Medium", "Web", f"HTTP {status} on {path}"
+        if status.startswith("5"):
+            return ip, "SERVER_ERROR", "Medium", "Web", f"HTTP {status} server error on {path}"
+        return ip, "HTTP_REQUEST", "Low", "Web", f"HTTP {status} {path}"
+
+    # ── Generic fallback patterns ──────────────────────────────────────────
+
+    if "PORT SCAN" in upper or "PORTSCAN" in upper or "NMAP" in upper:
+        return ip, "PORT_SCAN", "High", "Network", "Port scan detected"
+
+    if "SEGFAULT" in upper or "SEGMENTATION FAULT" in upper:
+        return ip, "SEGFAULT", "Medium", "System", "Segmentation fault — possible exploit attempt"
+
+    if "OUT OF MEMORY" in upper or "OOM KILLER" in upper:
+        return ip, "OOM", "Medium", "System", "Out of memory event detected"
+
+    if "ERROR" in upper:
+        return ip, "ERROR", "Medium", "System", "Error event detected"
+
+    if "WARNING" in upper or "WARN" in upper:
+        return ip, "WARNING", "Low", "System", "Warning event detected"
+
+    if "CRITICAL" in upper:
+        return ip, "CRITICAL", "High", "System", "Critical event detected"
+
+    return ip, "UNKNOWN", "Low", "Uncategorized", "Unclassified event"
 
 # ---------------------------------------------------------------------------
 # Auth routes
