@@ -106,5 +106,7 @@ if __name__ == "__main__":
         "gunicorn", "app:app",
         "--bind", f"0.0.0.0:{port}",
         "--workers", "2",
-        "--timeout", "60",
+        "--timeout", "120",
+        "--limit-request-line", "0",
+        "--limit-request-field_size", "0",
     ])
