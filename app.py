@@ -313,6 +313,34 @@ def extract_account(line):
     return "Unknown"
 
 
+def parse_windows_events(raw_text):
+    """
+    Windows Event Viewer exports each event as a tab-separated header line
+    followed by indented detail lines. This joins them into single records.
+    """
+    events = []
+    current = []
+    for line in raw_text.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        # A new event starts with Audit Success/Failure or a known keyword
+        if stripped.startswith(("Audit Success", "Audit Failure", "Information", "Warning", "Error", "Critical")):
+            if current:
+                events.append(" ".join(current))
+            current = [stripped]
+        else:
+            # Continuation line — append to current event
+            if current:
+                current.append(stripped)
+            else:
+                # Standalone line (non-Windows format)
+                events.append(stripped)
+    if current:
+        events.append(" ".join(current))
+    return events
+
+
 def classify_event(line: str):
     """
     Classify a single log line from multiple formats:
@@ -642,9 +670,18 @@ def upload_logs():
     if len(raw) > MAX_FILE_SIZE:
         abort(413, "File exceeds the 5 MB limit.")
     try:
-        lines = raw.decode("utf-8").splitlines()
+        text = raw.decode("utf-8")
     except UnicodeDecodeError:
-        abort(400, "File must be UTF-8 encoded text.")
+        try:
+            text = raw.decode("utf-16")
+        except UnicodeDecodeError:
+            abort(400, "File must be UTF-8 or UTF-16 encoded text.")
+
+    # If it looks like a Windows Event Viewer export, join multi-line events
+    if "Microsoft-Windows-Security-Auditing" in text or "Audit Success" in text or "Audit Failure" in text:
+        lines = parse_windows_events(text)
+    else:
+        lines = text.splitlines()
 
     rem          = remaining_events(db, org_id)   # None = unlimited
     inserted     = 0
