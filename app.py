@@ -65,6 +65,7 @@ ALERT_FROM_EMAIL = os.environ.get("ALERT_FROM_EMAIL", "alerts@logsentry.io")
 
 login_manager = LoginManager(app)
 login_manager.login_view    = "login"
+login_manager.login_message_category = "error"
 login_manager.login_message = "Please log in to access the dashboard."
 
 
@@ -621,6 +622,13 @@ def logout():
 # ---------------------------------------------------------------------------
 
 @app.route("/")
+def root():
+    if current_user.is_authenticated:
+        return redirect(url_for("index"))
+    return redirect(url_for("landing"))
+
+
+@app.route("/dashboard")
 @login_required
 def index():
     db     = get_db()
