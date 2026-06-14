@@ -401,7 +401,7 @@ table {
 
 colgroup col.col-id   { width: 5%; }
 colgroup col.col-ip   { width: 14%; }
-colgroup col.col-type { width: 14%; }
+colgroup col.col-type { width: 20%; }
 colgroup col.col-sev  { width: 10%; }
 colgroup col.col-cat  { width: 13%; }
 colgroup col.col-desc { width: auto; }
@@ -621,6 +621,10 @@ td.col-desc {
     color: var(--red);
     border-color: var(--red-border);
     background: var(--red-bg);
+    white-space: normal;
+    word-break: break-word;
+    display: inline-flex;
+    align-items: center;
 }
 
 /* ── Nav links group (index) ── */
