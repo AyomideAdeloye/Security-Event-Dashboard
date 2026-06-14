@@ -618,13 +618,14 @@ td.col-desc {
 
 /* Red-tinted badge variant for the alerts table */
 .type-badge-alert {
-    color: var(--red);
-    border-color: var(--red-border);
-    background: var(--red-bg);
+    color: #ffffff;
+    border-color: var(--red);
+    background: var(--red);
     white-space: normal;
     word-break: break-word;
     display: inline-flex;
     align-items: center;
+    min-width: 60px;
 }
 
 /* ── Nav links group (index) ── */
