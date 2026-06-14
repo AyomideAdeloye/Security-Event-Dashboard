@@ -62,8 +62,8 @@
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">IP address</th>
-                    <th scope="col">Alert type</th>
-                    <th scope="col">Severity</th>
+                    <th scope="col">Event type</th>
+                    <th scope="col">Category</th>
                     <th scope="col">Description</th>
                 </tr>
             </thead>
@@ -73,29 +73,25 @@
                     <tr>
                         <td class="col-id">{{ row['id'] }}</td>
                         <td class="col-ip">{{ row['ip_address'] }}</td>
-                        <td>
-                            <span class="type-badge type-badge-alert">{{ row['alert_type'] }}</span>
-                        </td>
-                        <td>
-                            <span class="sev sev-{{ row['severity'] | lower }}">
-                                <span class="sev-dot"></span>
-                                {{ row['severity'] }}
-                            </span>
-                        </td>
+                        <td><span class="type-badge type-badge-alert" style="color:#ffffff !important;font-size:0.65rem;letter-spacing:0.05em;">{{ row['event_type'] }}</span></td>
+                        <td>{{ row['category'] }}</td>
                         <td class="col-desc">{{ row['description'] }}</td>
                     </tr>
-                {% endfor %}
-            {% else %}
-                <tr>
-                    <td colspan="5">
-                        <div class="empty-state">
-                            <div class="empty-title">No alerts</div>
-                            <div class="empty-sub">No detection rules have been triggered.</div>
-                        </div>
-                    </td>
-                </tr>
-            {% endif %}
-        </tbody>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <div class="empty-icon">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                </div>
+                                <div class="empty-title">No alerts</div>
+                                <div class="empty-sub">No high-severity events have been recorded.</div>
+                            </div>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
         </table>
     </div>
 
