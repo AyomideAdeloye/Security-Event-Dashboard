@@ -32,19 +32,19 @@ PLANS = {
     "free": {
         "name":        "Free",
         "price":       0,
-        "event_limit": 500,          # None = unlimited
+        "event_limit": 500,
         "stripe_price_id": None,
     },
     "starter": {
-        "name":        "Starter",
-        "price":       29,
+        "name":        "Pro",
+        "price":       99,
         "event_limit": 50_000,
         "stripe_price_id": os.environ.get("STRIPE_STARTER_PRICE_ID", ""),
     },
     "pro": {
-        "name":        "Pro",
-        "price":       79,
-        "event_limit": None,         # unlimited
+        "name":        "Enterprise",
+        "price":       249,
+        "event_limit": None,
         "stripe_price_id": os.environ.get("STRIPE_PRO_PRICE_ID", ""),
     },
 }
