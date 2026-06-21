@@ -57,7 +57,7 @@ stripe.api_key        = os.environ.get("STRIPE_SECRET_KEY", "")
 STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
 
 resend.api_key   = os.environ.get("RESEND_API_KEY", "")
-ALERT_FROM_EMAIL = os.environ.get("ALERT_FROM_EMAIL", "alerts@logsentry.io")
+ALERT_FROM_EMAIL = os.environ.get("ALERT_FROM_EMAIL", "alerts@universallogg.io")
 
 # ---------------------------------------------------------------------------
 # Flask-Login
@@ -249,7 +249,7 @@ def send_high_severity_alert(to_email, org_name, event):
         resend.Emails.send({
             "from": ALERT_FROM_EMAIL,
             "to":   [to_email],
-            "subject": f"[LogSentry] High severity alert — {event['event_type']}",
+            "subject": f"[UniversalLogg] High severity alert — {event['event_type']}",
             "html": f"""
                 <div style="font-family:monospace;background:#0d0f12;color:#e8eaf0;padding:24px;border-radius:8px;">
                     <h2 style="color:#f05252;margin-top:0;">⚠ High Severity Alert</h2>
@@ -260,7 +260,7 @@ def send_high_severity_alert(to_email, org_name, event):
                         <tr><td style="color:#6b7280;padding:6px 0;">Category</td><td style="color:#e8eaf0;">{event['category']}</td></tr>
                         <tr><td style="color:#6b7280;padding:6px 0;">Description</td><td style="color:#e8eaf0;">{event['description']}</td></tr>
                     </table>
-                    <p style="margin-top:24px;"><a href="https://logsentry.io/alerts" style="color:#60a5fa;">View all alerts →</a></p>
+                    <p style="margin-top:24px;"><a href="https://universallogg.io/alerts" style="color:#60a5fa;">View all alerts →</a></p>
                 </div>
             """,
         })
@@ -590,7 +590,7 @@ def signup():
             except Exception as e:
                 app.logger.error(f"Stripe customer creation failed: {e}")
         login_user(User(user_id, org_id, email, "admin"))
-        flash("Welcome to LogSentry!", "success")
+        flash("Welcome to UniversalLogg!", "success")
         return redirect(url_for("index"))
     return render_template("signup.html")
 
@@ -1001,8 +1001,8 @@ def agent_install():
 @app.route("/agent/download")
 def download_agent():
     from flask import send_file
-    agent_path = os.path.join(os.path.dirname(__file__), "logsentry-agent.py")
-    return send_file(agent_path, as_attachment=True, download_name="logsentry-agent.py")
+    agent_path = os.path.join(os.path.dirname(__file__), "universallogg-agent.py")
+    return send_file(agent_path, as_attachment=True, download_name="universallogg-agent.py")
 
 
 # ---------------------------------------------------------------------------
@@ -1031,13 +1031,13 @@ def waitlist_signup():
             resend.Emails.send({
                 "from": ALERT_FROM_EMAIL,
                 "to":   [email],
-                "subject": "You're on the LogSentry waitlist!",
+                "subject": "You're on the UniversalLogg waitlist!",
                 "html": """
                     <div style="font-family:sans-serif;background:#0d0f12;color:#e8eaf0;padding:32px;border-radius:8px;max-width:480px;">
                         <h2 style="color:#60a5fa;margin-top:0;">You're on the list 🎉</h2>
-                        <p>Thanks for joining the LogSentry waitlist. We're putting the finishing touches on the product and will email you the moment we launch.</p>
+                        <p>Thanks for joining the UniversalLogg waitlist. We're putting the finishing touches on the product and will email you the moment we launch.</p>
                         <p style="margin-top:16px;"><strong>Early access perk:</strong> the first wave of signups gets 3 months of Starter free ($87 value).</p>
-                        <p style="color:#6b7280;font-size:14px;margin-top:24px;">— The LogSentry team</p>
+                        <p style="color:#6b7280;font-size:14px;margin-top:24px;">— The UniversalLogg team</p>
                     </div>
                 """,
             })

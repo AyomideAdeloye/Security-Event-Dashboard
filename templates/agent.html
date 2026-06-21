@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Install Agent — LogSentry</title>
+    <title>Install Agent — UniversalLogg</title>
     <link rel="stylesheet" href="/static/style.css">
     <style>
         .install-wrap { max-width: 720px; margin: 0 auto; padding: 2rem; }
@@ -75,8 +75,8 @@
     </div>
 
     <div class="install-header">
-        <h2>Install the LogSentry agent</h2>
-        <p>The agent runs on your Linux server, watches your log files, and automatically ships new events to LogSentry every 5 seconds. No manual uploads needed.</p>
+        <h2>Install the UniversalLogg agent</h2>
+        <p>The agent runs on your Linux server, watches your log files, and automatically ships new events to UniversalLogg every 5 seconds. No manual uploads needed.</p>
     </div>
 
     <!-- Step 1 -->
@@ -99,7 +99,7 @@
         <p>SSH into your Linux server and run:</p>
         <div class="code-block">
             <pre>curl -O https://security-event-dashboard-production.up.railway.app/agent/download
-mv download logsentry-agent.py</pre>
+mv download UniversalLogg-agent.py</pre>
             <button class="copy-btn" onclick="copyCode(this)">Copy</button>
         </div>
     </div>
@@ -124,7 +124,7 @@ mv download logsentry-agent.py</pre>
         <h3>Run the agent</h3>
         <p>Replace <code style="font-family:var(--mono);font-size:.8rem;color:var(--blue)">YOUR_API_KEY</code> with the key from Step 1:</p>
         <div class="code-block">
-            <pre>python3 logsentry-agent.py --key YOUR_API_KEY</pre>
+            <pre>python3 UniversalLogg-agent.py --key YOUR_API_KEY</pre>
             <button class="copy-btn" onclick="copyCode(this)">Copy</button>
         </div>
         <p style="margin-top:.75rem;">The agent will start watching your log files and shipping events automatically.</p>
@@ -138,7 +138,7 @@ mv download logsentry-agent.py</pre>
         <h3>Install as a background service</h3>
         <p>To run the agent automatically on boot (recommended for production):</p>
         <div class="code-block">
-            <pre>sudo python3 logsentry-agent.py --key YOUR_API_KEY --install</pre>
+            <pre>sudo python3 UniversalLogg-agent.py --key YOUR_API_KEY --install</pre>
             <button class="copy-btn" onclick="copyCode(this)">Copy</button>
         </div>
         <p style="margin-top:.75rem;">This installs a systemd service that starts automatically and restarts if it crashes.</p>
@@ -149,7 +149,7 @@ mv download logsentry-agent.py</pre>
     <div class="note">
         <strong>Which log files does the agent watch?</strong><br>
         By default it watches <code style="font-family:var(--mono);font-size:.78rem;">/var/log/auth.log</code>, <code style="font-family:var(--mono);font-size:.78rem;">/var/log/syslog</code>, and common web server logs. To watch custom files, use the <code style="font-family:var(--mono);font-size:.78rem;">--files</code> flag:<br><br>
-        <code style="font-family:var(--mono);font-size:.78rem;">python3 logsentry-agent.py --key YOUR_KEY --files /var/log/myapp.log /var/log/auth.log</code>
+        <code style="font-family:var(--mono);font-size:.78rem;">python3 UniversalLogg-agent.py --key YOUR_KEY --files /var/log/myapp.log /var/log/auth.log</code>
     </div>
 </div>
 
